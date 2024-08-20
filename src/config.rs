@@ -1,7 +1,6 @@
 use config::{Config, ConfigError, Environment, File};
 use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
-use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DatabaseSettings {
@@ -22,7 +21,7 @@ impl Settings {
         dotenv().ok();
 
         let settings = Config::builder()
-            .add_source(File::with_name("config"))
+            .add_source(File::with_name("src/config"))
             .add_source(Environment::default().separator("__"))
             .build()?;
 

@@ -8,13 +8,14 @@ use axum::{
 use config::Settings;
 use db::{connect_db, DB};
 use serde::{Deserialize, Serialize};
+use surrealdb::sql::Thing;
 
 mod config;
 mod db;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Scenario {
-    pub id: String,
+    pub id: Thing,
     pub title: String,
     pub content: String,
 }
@@ -25,13 +26,6 @@ async fn hello_world() -> &'static str {
 
 #[derive(Deserialize, Serialize)]
 struct CreateScenario {
-    title: String,
-    content: String,
-}
-
-#[derive(Deserialize, Serialize)]
-struct UpdateScenario {
-    id: String,
     title: String,
     content: String,
 }
@@ -55,7 +49,7 @@ async fn delete_scenario(Path(id): Path<String>) -> impl IntoResponse {
 #[shuttle_runtime::main]
 async fn axum() -> shuttle_axum::ShuttleAxum {
     let settings = Settings::new().expect("Failed to load config");
-
+    dbg!(&settings);
     connect_db(settings.database)
         .await
         .expect("Database connection fails");
