@@ -56,7 +56,9 @@ async fn delete_scenario(Path(id): Path<String>) -> impl IntoResponse {
 async fn axum() -> shuttle_axum::ShuttleAxum {
     let settings = Settings::new().expect("Failed to load config");
 
-    connect_db(settings.database).await.unwrap();
+    connect_db(settings.database)
+        .await
+        .expect("Database connection fails");
 
     let router = Router::new()
         .route("/", get(hello_world))
