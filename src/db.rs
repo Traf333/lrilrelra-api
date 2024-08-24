@@ -1,25 +1,34 @@
 use once_cell::sync::Lazy;
+use shuttle_runtime::SecretStore;
 use surrealdb::{
     engine::remote::ws::{Client, Wss},
     opt::auth::Root,
     Result, Surreal,
 };
 
-use crate::config::DatabaseSettings;
-
 pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
-pub async fn connect_db(settings: DatabaseSettings) -> Result<()> {
-    let _ = DB.connect::<Wss>(&settings.url).await?;
+pub async fn connect_db(secrets: SecretStore) -> Result<()> {
+    let _ = DB
+        .connect::<Wss>(&secrets.get("URL").expect("database url should be set"))
+        .await?;
     let _ = DB
         .signin(Root {
-            username: &settings.username,
-            password: &settings.password,
+            username: &secrets
+                .get("USERNAME")
+                .expect("database username should be set"),
+            password: &secrets
+                .get("PASSWORD")
+                .expect("database password should be set"),
         })
         .await;
     let _ = DB
-        .use_ns(&settings.namespace)
-        .use_db(&settings.dbname)
+        .use_ns(
+            &secrets
+                .get("NAMESPACE")
+                .expect("database namespace should be set"),
+        )
+        .use_db(&secrets.get("DBNAME").expect("database name should be set"))
         .await?;
     Ok(())
 }
