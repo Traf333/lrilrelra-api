@@ -10,7 +10,11 @@ pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
 pub async fn connect_db(secrets: SecretStore) -> Result<()> {
     let _ = DB
-        .connect::<Wss>(&secrets.get("URL").expect("database url should be set"))
+        .connect::<Wss>(&format!(
+            "ws://{}:{}/rpc",
+            &secrets.get("URL").expect("database url should be set"),
+            &secrets.get("PORT").expect("database port should be set")
+        ))
         .await?;
     let _ = DB
         .signin(Root {

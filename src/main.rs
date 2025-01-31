@@ -13,10 +13,13 @@ use surrealdb::sql::Thing;
 mod db;
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Scenario {
     pub id: Thing,
     pub title: String,
+    pub author: String,
     pub content: String,
+    pub actors_number: u32,
 }
 
 async fn hello_world() -> &'static str {
@@ -24,9 +27,12 @@ async fn hello_world() -> &'static str {
 }
 
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct CreateScenario {
     title: String,
+    author: String,
     content: String,
+    actors_number: u32,
 }
 
 #[derive(Deserialize, Serialize)]
