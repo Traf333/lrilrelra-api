@@ -1,7 +1,7 @@
 use once_cell::sync::Lazy;
 use shuttle_runtime::SecretStore;
 use surrealdb::{
-    engine::remote::ws::{Client, Wss},
+    engine::remote::ws::{Client, Ws},
     opt::auth::Root,
     Result, Surreal,
 };
@@ -10,8 +10,8 @@ pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
 pub async fn connect_db(secrets: SecretStore) -> Result<()> {
     let _ = DB
-        .connect::<Wss>(&format!(
-            "ws://{}:{}/rpc",
+        .connect::<Ws>(&format!(
+            "{}:{}",
             &secrets.get("URL").expect("database url should be set"),
             &secrets.get("PORT").expect("database port should be set")
         ))

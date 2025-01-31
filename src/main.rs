@@ -45,9 +45,14 @@ async fn get_scenarios() -> (StatusCode, Json<Vec<Scenario>>) {
     (StatusCode::OK, Json(records))
 }
 
-async fn create_scenario(Json(payload): Json<CreateScenario>) -> (StatusCode, Json<Vec<Scenario>>) {
-    let record = DB.create("scenario").content(payload).await.unwrap();
-    (StatusCode::CREATED, Json(record))
+async fn create_scenario(
+    Json(payload): Json<CreateScenario>,
+) -> (StatusCode, Json<Option<Scenario>>) {
+    let record: Option<Scenario> = DB.create("scenario").content(payload).await.unwrap();
+    match record {
+        Some(record) => (StatusCode::CREATED, Json(Some(record))),
+        None => (StatusCode::INTERNAL_SERVER_ERROR, Json(None)),
+    }
 }
 
 async fn delete_scenario(Path(id): Path<String>) -> impl IntoResponse {
